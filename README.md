@@ -104,6 +104,9 @@ CLion 工程**不需要重新运行脚本**！因为 compile_commands.json 会�
 1. 在 CLion 中重新编译项目（更新 compile_commands.json）
 2. 重启 clangd
 
+### 可能问题
+1. 运行脚本有问题，请编译，再重新加载trae
+
 ---
 
 ## 📂 文件说明
