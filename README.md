@@ -90,11 +90,18 @@ python setup_clangd_clion.py
 
 ## 🔄 日常使用
 
-### 添加新文件/文件夹后
+### Keil 工程（添加新文件/文件夹后）
 
 每当添加了新的 C 源文件或源代码目录后：
 
 1. 重新运行配置脚本
+2. 重启 clangd
+
+### CLion 工程（添加新文件/文件夹后）
+
+CLion 工程**不需要重新运行脚本**！因为 compile_commands.json 会在 CLion 编译时自动更新。你只需要：
+
+1. 在 CLion 中重新编译项目（更新 compile_commands.json）
 2. 重启 clangd
 
 ---
