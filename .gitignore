@@ -1,0 +1,32 @@
+# Keil工程文件
+*.uvprojx
+*.uvoptx
+*.uvguix*
+
+# 工程目录
+Start/
+Library/
+User/
+System/
+Hardware/
+Core/
+Drivers/
+Middlewares/
+DebugConfig/
+
+# 编译输出
+Debug/
+Release/
+Output/
+Listings/
+Objects/
+
+# clangd缓存
+.cache/
+.clangd
+compile_commands.json
+
+# 其他
+*.bat
+*.o
+*.d
