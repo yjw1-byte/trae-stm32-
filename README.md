@@ -1,13 +1,15 @@
 # STM32 Clangd 配置工具
 
-在 Trae IDE 中为 Keil STM32 工程自动配置 clangd，实现代码跳转、补全和语法检查。
+在 Trae IDE 中为 STM32 工程自动配置 clangd，实现代码跳转、补全和语法检查。
+
+支持 Keil 和 CLion 两种工程类型！
 
 ---
 
 ## ✨ 特性
 
-- 🚀 **自动识别**：从 Keil 工程文件提取配置
-- 🎯 **双脚本支持**：标准外设库和 CubeMX HAL 库
+- 🚀 **自动识别**：从工程文件提取配置
+- 🎯 **三脚本支持**：Keil 标准库、Keil CubeMX、CLion
 - 🔧 **全系列兼容**：STM32 F0/F1/F2/F3/F4/F7/H7/L0/L1/L4/G0/G4
 - ⚡ **一键配置**：只需运行一个脚本
 
@@ -15,13 +17,13 @@
 
 ## 📋 脚本选择
 
-| 特性 | setup_clangd.py | setup_clangd_cubemx.py |
-|------|------------------|-------------------------|
-| **适用工程** | 标准外设库工程（如江科大教程） | STM32CubeMX 生成的工程（HAL 库） |
-| **目录结构** | Start、Library、User、System、Hardware | Core、Drivers、Middlewares |
-| **驱动库** | 标准外设库 (StdPeriph) | HAL 库 |
-| **宏定义** | USE_STDPERIPH_DRIVER | USE_HAL_DRIVER |
-| **支持的系列** | F1、F4 | F0/F1/F2/F3/F4/F7/H7/L0/L1/L4/G0/G4 全系列 |
+| 特性 | setup_clangd.py | setup_clangd_cubemx.py | setup_clangd_clion.py |
+|------|------------------|-------------------------|-----------------------|
+| **适用工程** | Keil 标准外设库工程 | Keil CubeMX 生成的工程 | CLion (CMake) 工程 |
+| **目录结构** | Start、Library、User | Core、Drivers、Middlewares | CMake build 目录 |
+| **驱动库** | 标准外设库 (StdPeriph) | HAL 库 | HAL 库 |
+| **宏定义** | USE_STDPERIPH_DRIVER | USE_HAL_DRIVER | - |
+| **配置来源** | 解析 .uvprojx | 解析 .uvprojx | 使用 compile_commands.json |
 
 ---
 
@@ -29,19 +31,23 @@
 
 ### 1. 判断工程类型
 
-- 有 `Start/`、`Library/` 目录 → 用 `setup_clangd.py`
-- 有 `Core/`、`Drivers/` 目录 → 用 `setup_clangd_cubemx.py`
+- Keil 工程 + `Start/`、`Library/` → 用 `setup_clangd.py`
+- Keil 工程 + `Core/`、`Drivers/` → 用 `setup_clangd_cubemx.py`
+- CLion (CMake) 工程 → 用 `setup_clangd_clion.py`
 
 ### 2. 复制脚本到工程根目录
 
 ### 3. 运行脚本
 
 ```bash
-# 标准外设库工程
+# Keil 标准外设库工程
 python setup_clangd.py
 
-# CubeMX 工程
+# Keil CubeMX 工程
 python setup_clangd_cubemx.py
+
+# CLion 工程
+python setup_clangd_clion.py
 ```
 
 ### 4. 重启 clangd
@@ -54,7 +60,7 @@ python setup_clangd_cubemx.py
 
 ## 📝 脚本功能
 
-### setup_clangd.py（标准外设库）
+### setup_clangd.py（Keil 标准外设库）
 
 - ✅ 从 Project.uvprojx 读取 IncludePath 和 Define
 - ✅ 从 <Cpu> 标签提取 CPU 类型
@@ -65,12 +71,20 @@ python setup_clangd_cubemx.py
 - ✅ 去重并保持 Keil 一致的顺序
 - ✅ 生成 .clangd 和 compile_commands.json
 
-### setup_clangd_cubemx.py（CubeMX HAL 库）
+### setup_clangd_cubemx.py（Keil CubeMX HAL 库）
 
 - ✅ 支持 CubeMX 典型目录结构（Core、Drivers、Middlewares）
 - ✅ 自动识别 USE_HAL_DRIVER
 - ✅ 支持 STM32 全系列
 - ✅ 所有标准脚本功能
+
+### setup_clangd_clion.py（CLion CMake 工程）
+
+- ✅ 自动查找 compile_commands.json
+- ✅ 自动查找 ARM GCC 工具链
+- ✅ 配置 sysroot 和系统头文件路径
+- ✅ 支持 CLion 内置工具链和独立工具链
+- ✅ 生成 .clangd 配置文件
 
 ---
 
@@ -87,20 +101,24 @@ python setup_clangd_cubemx.py
 
 ## 📂 文件说明
 
-- `setup_clangd.py` - 标准外设库配置脚本
-- `setup_clangd_cubemx.py` - CubeMX HAL 库配置脚本
+- `setup_clangd.py` - Keil 标准外设库配置脚本
+- `setup_clangd_cubemx.py` - Keil CubeMX HAL 库配置脚本
+- `setup_clangd_clion.py` - CLion (CMake) 工程配置脚本
 - `.clangd` - clangd 配置文件（必需）
-- `compile_commands.json` - 编译命令数据库（可选）
+- `compile_commands.json` - 编译命令数据库（CLion 必需）
 
 ---
 
 ## 💡 提示词
 
-### 标准外设库工程
+### Keil 标准外设库工程
 > "帮我在这个 Keil STM32 工程目录下运行 setup_clangd.py 配置 clangd"
 
-### CubeMX 工程
+### Keil CubeMX 工程
 > "帮我在这个 STM32CubeMX 生成的工程目录下运行 setup_clangd_cubemx.py 配置 clangd"
+
+### CLion 工程
+> "帮我在这个 CLion STM32 工程目录下运行 setup_clangd_clion.py 配置 clangd"
 
 ---
 
